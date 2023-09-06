@@ -5,11 +5,7 @@
  */
 package ibd.table;
 
-import ibd.index.btree.DictionaryPair;
-import ibd.index.btree.Key;
-import ibd.index.btree.RowSchema;
-import ibd.index.btree.Value;
-import ibd.index.btree.BPlusTreeFile;
+import ibd.index.btree.*;
 import ibd.persistent.PersistentPageFile;
 import ibd.persistent.cache.Cache;
 import ibd.table.record.Record;
@@ -20,7 +16,7 @@ import java.util.List;
 
 public class BTreeTable extends Table implements Iterable {
 
-    BPlusTreeFile tree = null;
+    BPlusTreeFileGustavoMachadoDeFreitas tree = null;
     RowSchema keyPrototype;
     RowSchema valuePrototype;
     
@@ -45,8 +41,8 @@ public class BTreeTable extends Table implements Iterable {
         
         //creates a BTree instance using the defined buffer manager, if any
         if (lru!=null)
-            tree = new BPlusTreeFile(5, 7, lru, keyPrototype, valuePrototype);
-        else tree = new BPlusTreeFile(5, 7, p, keyPrototype, valuePrototype);
+            tree = new BPlusTreeFileGustavoMachadoDeFreitas(5, 7, lru, keyPrototype, valuePrototype);
+        else tree = new BPlusTreeFileGustavoMachadoDeFreitas(5, 7, p, keyPrototype, valuePrototype);
     }
 
     public Cache defineBufferManagement(PersistentPageFile file) {
