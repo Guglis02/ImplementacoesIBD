@@ -326,8 +326,8 @@ public class MainTrabalho {
 
         MainTrabalho main = new MainTrabalho();
 
-        //main.testBorrowFromSiblingStrategy();
-        main.testRightSiblingMergeStrategy();
+        main.testBorrowFromSiblingStrategy();
+        //main.testRightSiblingMergeStrategy();
         //main.testLeftSiblingMergeStrategy();
 
     }

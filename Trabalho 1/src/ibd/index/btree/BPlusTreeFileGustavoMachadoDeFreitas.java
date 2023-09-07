@@ -439,21 +439,44 @@ public class BPlusTreeFileGustavoMachadoDeFreitas extends BPlusTree implements P
 
                         sibling = ln.leftSibling;
 
+                        // Último registro do nó da esquerda
+                        DictionaryPair lastPair = sibling.getLastDictionaryPair();
+
+                        // Move para a primeira posição do nó deficiente
+                        ln.prependPair(lastPair);
+                        sibling.deleteLastDictionaryPair();
+
+                        // Atualiza entrada correspondente do nó pai
+                        parent.keys[parent.findIndexOfPointer(ln) - 1] = lastPair.key;
+
                         //System.out.println("BORROW FROM LEFT");
+                        // Salva em disco as alterações
                         writeNode(ln);
+                        writeNode(parent);
+                        writeNode(sibling);
                         return valueToDelete;
-
-
                     } else if (ln.rightSibling != null
                             && ln.rightSibling.getParentID() == ln.getParentID()
                             && ln.rightSibling.isLendable()) {
 
                         sibling = ln.rightSibling;
+
+                        // Primeiro registro do nó da direita
+                        DictionaryPair firstPair = sibling.getFirstDictionaryPair();
+
+                        // Move para a última posição do nó deficiente
+                        ln.appendPair(firstPair);
+                        sibling.deleteFirstDictionaryPair();
+
+                        // Atualiza entrada correspondente do nó pai
+                        parent.keys[parent.findIndexOfPointer(sibling) - 1] = sibling.getFirstDictionaryPair().key;
+
                         //System.out.println("BORROW FROM RIGHT");
-
+                        // Salva em disco as alterações
                         writeNode(ln);
+                        writeNode(parent);
+                        writeNode(sibling);
                         return valueToDelete;
-
                     } // Merge: First, check the left sibling, then the right sibling
                     else if (ln.leftSibling != null
                             && ln.leftSibling.getParentID() == ln.getParentID()
@@ -461,21 +484,76 @@ public class BPlusTreeFileGustavoMachadoDeFreitas extends BPlusTree implements P
 
                         sibling = ln.leftSibling;
 
+                        // No pai, remove entrada correspondente ao nó deficiente
+                        parent.removeEntry(parent.findIndexOfPointer(ln));
+
+                        // Adiciona todas as entradas do nó deficiente no final do nó da esquerda
+                        sibling.appendPairs(ln);
+
+                        // Atualiza ponteiros
+                        sibling.rightSiblingID = ln.rightSiblingID;
+
+                        // Se o nó a direita do deficiente existir
+                        if (ln.rightSiblingID > 0)
+                        {
+                            LeafNode rightSibling = (LeafNode) getNode(ln.rightSiblingID);
+
+                            sibling.rightSibling = rightSibling;
+
+                            rightSibling.leftSiblingID = ln.leftSiblingID;
+                            rightSibling.leftSibling = sibling;
+                            writeNode(rightSibling);
+                        }
+
+                        // Remove index
+                        deleteNode(ln);
+
                         //System.out.println("MERGE WITH LEFT");
-                        writeNode(ln);
+                        // Salva em disco as alterações
+                        writeNode(parent);
+                        writeNode(sibling);
                         return valueToDelete;
-
-
                     } else if (ln.rightSibling != null
                             && ln.rightSibling.getParentID() == ln.getParentID()
                             && ln.rightSibling.isMergeable()) {
 
                         sibling = ln.rightSibling;
 
-                        //System.out.println("MERGE WITH RIGHT");
-                        writeNode(ln);
-                        return valueToDelete;
+                        // No pai, remover entrada correspondente ao nó deficiente
+                        parent.removeEntry1(parent.findIndexOfPointer(ln));
 
+                        // Adiciona todas as entradas do nó deficiente no começo do nó da direita
+                        sibling.prependPairs(ln);
+
+                        // Atualiza ponteiros
+                        sibling.leftSiblingID = ln.leftSiblingID;
+
+                        // Se o nó da esquerda do deficiente existir
+                        if (ln.leftSiblingID > 0)
+                        {
+                            LeafNode leftSibling = (LeafNode) getNode(ln.leftSiblingID);
+
+                            sibling.leftSibling = leftSibling;
+
+                            leftSibling.rightSiblingID = ln.rightSiblingID;
+                            leftSibling.rightSibling = sibling;
+                            writeNode(leftSibling);
+                        }
+                        // Se não existir -> ln era o first leaf
+                        // Sibling passa a ser o first leaf
+                        else
+                        {
+                            setFirstLeafID(sibling.getPageID());
+                        }
+
+                        // Remove nó deficiente
+                        deleteNode(ln);
+
+                        // System.out.println("MERGE WITH RIGHT");
+                        // Salva em disco as alterações
+                        writeNode(parent);
+                        writeNode(sibling);
+                        return valueToDelete;
                         //printTree();
                     } else {
                         writeNode(ln);
