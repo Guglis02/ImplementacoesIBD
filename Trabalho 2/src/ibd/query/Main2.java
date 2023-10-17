@@ -6,7 +6,6 @@
 package ibd.query;
 
 import ibd.query.sourceop.FullTableScan;
-import ibd.query.unaryop.DuplicateRemovalGustavoMachadoDeFreitas;
 import ibd.query.unaryop.PKHashIndex;
 import ibd.query.unaryop.filter.PKFilter;
 import ibd.query.binaryop.NestedLoopJoin;
@@ -62,7 +61,6 @@ public class Main2 {
         Table table1 = createTable("c:\\teste\\ibd", "tab1", Table.DEFULT_PAGE_SIZE, 1000, true, 1, 50);
         //Operation scan = new PKSort(new FullTableScan("t1", table1), "t1");
         Operation scan = new ContentSort(new FullTableScan("t1", table1), "t1");
-        Operation dr = new DuplicateRemovalGustavoMachadoDeFreitas(scan, "t1", true);
         return scan;
 
     }
@@ -145,8 +143,8 @@ public class Main2 {
 
             //Operation op = m.testNestedLoopJoinQueryWithFilter();
             //Operation op = m.testFilterQuery("Ana");         
-            //Operation op = m.testSimpleQuery();
-            Operation op = m.testSortQuery();
+            Operation op = m.testSimpleQuery();
+            //Operation op = m.testSortQuery();
             
             Params.BLOCKS_LOADED = 0;
             Params.BLOCKS_SAVED = 0;
