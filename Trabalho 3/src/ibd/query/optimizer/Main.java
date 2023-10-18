@@ -19,6 +19,8 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static ibd.table.Utils.createTable;
+
 /**
  *
  * @author Sergio
@@ -118,7 +120,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             Main m = new Main();
-            QueryOptimizer opt = new XXXQueryOptimizer();
+            QueryOptimizer opt = new GustavoMachadoDeFreitasQueryOptimizer();
             
             //uncomment these lines the first time you execute
             //createTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, 100, false, 2,50);
