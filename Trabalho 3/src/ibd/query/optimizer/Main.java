@@ -317,7 +317,7 @@ public class Main {
             
             System.out.println("**********TESTE 1");
             m.testOptimization(opt,m.createQuery1(), true, true);
-            
+
             System.out.println("**********TESTE 2");
             m.testOptimization(opt,m.createQuery2(), true, true);
 

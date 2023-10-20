@@ -45,7 +45,7 @@ public class IndexScan extends SourceOperation {
      */
     @Override
     public String toString() {
-        return "[" + dataSourceAlias + "] Table Scan";
+        return "[" + dataSourceAlias + "] Index Scan";
     }
 
     /**
