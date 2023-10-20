@@ -16,11 +16,9 @@ import static java.sql.DriverManager.println;
 public class GustavoMachadoDeFreitasQueryOptimizer implements QueryOptimizer {
 
     Operation rootOp;
-    List<PKFilter> filterList;
 
     @Override
     public Operation optimize(Operation op) {
-        filterList = new java.util.ArrayList<>();
         rootOp = op;
         recursiveOptimize(op);
         return rootOp;
@@ -32,13 +30,7 @@ public class GustavoMachadoDeFreitasQueryOptimizer implements QueryOptimizer {
             && ((PKFilter) op).getComparisonType() == ComparisonTypes.EQUAL)
         {
             PKFilter filter = (PKFilter) op;
-            filterList.add(filter);
-        }
-
-        if (op instanceof IndexScan
-            && !(op.getParentOperation() instanceof PKFilter) )
-        {
-            checkForFilter((IndexScan) op);
+            findIndexScan(filter, filter);
         }
 
         if (op instanceof UnaryOperation)
@@ -55,29 +47,33 @@ public class GustavoMachadoDeFreitasQueryOptimizer implements QueryOptimizer {
         }
     }
 
-    private void checkForFilter(IndexScan op) {
-        Iterator<PKFilter> filterIterator = filterList.iterator();
-
-        while (filterIterator.hasNext()) {
-            PKFilter filter = filterIterator.next();
-
-            if (filter.getDataSourceAlias().equals(op.getDataSourceAlias())) {
-
+    private void findIndexScan(Operation op, PKFilter filter) {
+        // Se encontrar um IndexScan que não possui um PKFilter
+        // e que consulte a mesma tabela do filtro, posiciona o filtro acima dele
+        if (op instanceof IndexScan
+            && !(op.getParentOperation() instanceof PKFilter)
+            && ((IndexScan) op).getDataSourceAlias().equals(filter.getDataSourceAlias())) {
                 Operation filterParent = filter.getParentOperation();
+                Operation opParent = op.getParentOperation();
+
                 if (filterParent == null) {
                     rootOp = filter.getChildOperation();
                 }
-
-                Operation opParent = op.getParentOperation();
 
                 reparentOperation(op, filter, opParent);
 
                 op.setParentOperation(filter);
                 filter.setChildOperation(op);
                 reparentOperation(filter, opParent, filterParent);
+        }
 
-                filterIterator.remove();
-            }
+        if (op instanceof UnaryOperation) {
+            UnaryOperation uop = (UnaryOperation) op;
+            findIndexScan(uop.getChildOperation(), filter);
+        } else if (op instanceof BinaryOperation) {
+            BinaryOperation bop = (BinaryOperation) op;
+            findIndexScan(bop.getLeftOperation(), filter);
+            findIndexScan(bop.getRightOperation(), filter);
         }
     }
 

@@ -117,6 +117,23 @@ public class Main {
 
         return filter1;
     }
+    private Operation createQuery3() throws Exception{
+        Table table1 = Directory.getTable(".", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable(".", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable(".", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, scan3);
+
+        Operation filter1 = new PKFilter(join2, "t1", ComparisonTypes.EQUAL, 20L);
+        Operation filter2 = new PKFilter(filter1, "t3", ComparisonTypes.EQUAL, 10L);
+
+        return filter2;
+    }
     private Operation createQuery15() throws Exception{
 
         Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
@@ -315,41 +332,44 @@ public class Main {
             //createTable("c:\\teste\\ibd", "t4", Table.DEFULT_PAGE_SIZE, 100, false, 1,50);
             
             
-            System.out.println("**********TESTE 1");
-            m.testOptimization(opt,m.createQuery1(), true, true);
+//            System.out.println("**********TESTE 1");
+//            m.testOptimization(opt,m.createQuery1(), true, true);
+//
+//            System.out.println("**********TESTE 2");
+//            m.testOptimization(opt,m.createQuery2(), true, true);
 
-            System.out.println("**********TESTE 2");
-            m.testOptimization(opt,m.createQuery2(), true, true);
+            System.out.println("**********TESTE 3");
+            m.testOptimization(opt,m.createQuery3(), true, true);
 
-            System.out.println("**********TESTE 15");
-            m.testOptimization(opt,m.createQuery15(), true, true);
-
-            System.out.println("**********TESTE 16");
-            m.testOptimization(opt,m.createQuery16(), true, true);
-
-            System.out.println("**********TESTE 17");
-            m.testOptimization(opt,m.createQuery17(), true, true);
-
-            System.out.println("**********TESTE 18");
-            m.testOptimization(opt,m.createQuery18(), true, true);
-
-            System.out.println("**********TESTE 19");
-            m.testOptimization(opt,m.createQuery19(), true, true);
-
-            System.out.println("**********TESTE 21");
-            m.testOptimization(opt,m.createQuery21(), true, true);
-
-            System.out.println("**********TESTE 22");
-            m.testOptimization(opt,m.createQuery22(), true, true);
-
-            System.out.println("**********TESTE 23");
-            m.testOptimization(opt,m.createQuery23(), true, true);
-
-            System.out.println("**********TESTE 24");
-            m.testOptimization(opt,m.createQuery24(), true, true);
-
-            System.out.println("**********TESTE 27");
-            m.testOptimization(opt,m.createQuery27(), true, true);
+//            System.out.println("**********TESTE 15");
+//            m.testOptimization(opt,m.createQuery15(), true, true);
+//
+//            System.out.println("**********TESTE 16");
+//            m.testOptimization(opt,m.createQuery16(), true, true);
+//
+//            System.out.println("**********TESTE 17");
+//            m.testOptimization(opt,m.createQuery17(), true, true);
+//
+//            System.out.println("**********TESTE 18");
+//            m.testOptimization(opt,m.createQuery18(), true, true);
+//
+//            System.out.println("**********TESTE 19");
+//            m.testOptimization(opt,m.createQuery19(), true, true);
+//
+//            System.out.println("**********TESTE 21");
+//            m.testOptimization(opt,m.createQuery21(), true, true);
+//
+//            System.out.println("**********TESTE 22");
+//            m.testOptimization(opt,m.createQuery22(), true, true);
+//
+//            System.out.println("**********TESTE 23");
+//            m.testOptimization(opt,m.createQuery23(), true, true);
+//
+//            System.out.println("**********TESTE 24");
+//            m.testOptimization(opt,m.createQuery24(), true, true);
+//
+//            System.out.println("**********TESTE 27");
+//            m.testOptimization(opt,m.createQuery27(), true, true);
 
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
