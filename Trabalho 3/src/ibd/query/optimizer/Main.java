@@ -5,6 +5,8 @@
  */
 package ibd.query.optimizer;
 
+import ibd.query.sourceop.FullTableScan;
+import ibd.query.unaryop.filter.ContentFilter;
 import ibd.table.Directory;
 import ibd.query.binaryop.NestedLoopJoin;
 import ibd.table.Params;
@@ -115,7 +117,191 @@ public class Main {
 
         return filter1;
     }
-    
+    private Operation createQuery15() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, scan3);
+
+        Operation filter1 = new PKFilter(join2, "t2", ComparisonTypes.EQUAL, 500L);
+
+        return filter1;
+    }
+    // pag 16
+    private Operation createQuery16() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new FullTableScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, scan3);
+
+        Operation filter1 = new PKFilter(join2, "t2", ComparisonTypes.EQUAL, 500L);
+
+        return filter1;
+    }
+    private Operation createQuery17() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, scan3);
+
+        Operation filter1 = new PKFilter(join2, "t2", ComparisonTypes.GREATER_THAN, 500L);
+
+        return filter1;
+    }
+    private Operation createQuery18() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation filter1 = new PKFilter(scan3, "t3", ComparisonTypes.EQUAL, 500L);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, filter1);
+
+        Operation filter2 = new PKFilter(join2, "t3", ComparisonTypes.EQUAL, 700L);
+
+        return filter2;
+    }
+
+    private Operation createQuery19() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation filter1 = new ContentFilter(scan3, "t3", ComparisonTypes.EQUAL, "Ana");
+        Operation filter2 = new PKFilter(filter1, "t3", ComparisonTypes.EQUAL, 5L);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, filter2);
+
+        return join2;
+    }
+
+
+    private Operation createQuery21() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation filter1 = new ContentFilter(scan3, "t3", ComparisonTypes.EQUAL, "Ana");
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, filter1);
+
+        return join2;
+    }
+
+
+    private Operation createQuery22() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation filter1 = new PKFilter(scan3, "t3", ComparisonTypes.EQUAL, 5);
+        Operation filter2 = new ContentFilter(filter1, "t3", ComparisonTypes.EQUAL, "Ana");
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, filter2);
+
+        return join2;
+    }
+    private Operation createQuery23() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation filter1 = new PKFilter(scan3, "t3", ComparisonTypes.GREATER_THAN, 5);
+        Operation filter2 = new ContentFilter(filter1, "t3", ComparisonTypes.EQUAL, "Ana");
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+        Operation join2 = new NestedLoopJoin(diff, filter2);
+
+        return join2;
+    }
+
+    private Operation createQuery24() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation filter1 = new PKFilter(scan1, "t1", ComparisonTypes.GREATER_THAN, 5L);
+        Operation filter2 = new ContentFilter(filter1, "t1", ComparisonTypes.EQUAL, "Ana");
+
+        Operation diff = new NestedLoopJoin(filter2, scan2);
+        Operation join2 = new NestedLoopJoin(diff, scan3);
+
+        return join2;
+    }
+    private Operation createQuery27() throws Exception{
+
+        Table table1 = Directory.getTable("c:\\teste\\ibd", "t1", Table.DEFULT_PAGE_SIZE, false);
+        Table table2 = Directory.getTable("c:\\teste\\ibd", "t2", Table.DEFULT_PAGE_SIZE, false);
+        Table table3 = Directory.getTable("c:\\teste\\ibd", "t3", Table.DEFULT_PAGE_SIZE, false);
+
+        Operation scan1 = new IndexScan("t1", table1);
+        Operation scan2 = new IndexScan("t2", table2);
+        Operation scan3 = new IndexScan("t3", table3);
+
+        Operation diff = new NestedLoopJoin(scan1, scan2);
+
+        Operation filter1 = new PKFilter(diff, "t2", ComparisonTypes.EQUAL, 5L);
+        Operation filter2 = new ContentFilter(scan3, "t3", ComparisonTypes.EQUAL, "Ana");
+
+        Operation join2 = new NestedLoopJoin(filter1, filter2);
+
+        return join2;
+    }
     
     public static void main(String[] args) {
         try {
@@ -135,6 +321,35 @@ public class Main {
             System.out.println("**********TESTE 2");
             m.testOptimization(opt,m.createQuery2(), true, true);
 
+            System.out.println("**********TESTE 15");
+            m.testOptimization(opt,m.createQuery15(), true, true);
+
+            System.out.println("**********TESTE 16");
+            m.testOptimization(opt,m.createQuery16(), true, true);
+
+            System.out.println("**********TESTE 17");
+            m.testOptimization(opt,m.createQuery17(), true, true);
+
+            System.out.println("**********TESTE 18");
+            m.testOptimization(opt,m.createQuery18(), true, true);
+
+            System.out.println("**********TESTE 19");
+            m.testOptimization(opt,m.createQuery19(), true, true);
+
+            System.out.println("**********TESTE 21");
+            m.testOptimization(opt,m.createQuery21(), true, true);
+
+            System.out.println("**********TESTE 22");
+            m.testOptimization(opt,m.createQuery22(), true, true);
+
+            System.out.println("**********TESTE 23");
+            m.testOptimization(opt,m.createQuery23(), true, true);
+
+            System.out.println("**********TESTE 24");
+            m.testOptimization(opt,m.createQuery24(), true, true);
+
+            System.out.println("**********TESTE 27");
+            m.testOptimization(opt,m.createQuery27(), true, true);
 
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
