@@ -26,17 +26,19 @@ public class GustavoMachadoDeFreitasQueryOptimizer implements QueryOptimizer {
 
     private void recursiveOptimize(Operation op)
     {
-        if (op instanceof PKFilter
-            && ((PKFilter) op).getComparisonType() == ComparisonTypes.EQUAL)
-        {
-            PKFilter filter = (PKFilter) op;
-            findIndexScan(filter, filter);
-        }
-
         if (op instanceof UnaryOperation)
         {
             UnaryOperation uop = (UnaryOperation) op;
-            recursiveOptimize(uop.getChildOperation());
+            Operation childOp = uop.getChildOperation();
+
+            if (op instanceof PKFilter
+                && ((PKFilter) op).getComparisonType() == ComparisonTypes.EQUAL)
+            {
+                PKFilter filter = (PKFilter) op;
+                findIndexScan(filter, filter);
+            }
+
+            recursiveOptimize(childOp);
         }
 
         if (op instanceof BinaryOperation)
@@ -55,10 +57,6 @@ public class GustavoMachadoDeFreitasQueryOptimizer implements QueryOptimizer {
             && ((IndexScan) op).getDataSourceAlias().equals(filter.getDataSourceAlias())) {
                 Operation filterParent = filter.getParentOperation();
                 Operation opParent = op.getParentOperation();
-
-                if (filterParent == null) {
-                    rootOp = filter.getChildOperation();
-                }
 
                 reparentOperation(op, filter, opParent);
 
@@ -81,6 +79,16 @@ public class GustavoMachadoDeFreitasQueryOptimizer implements QueryOptimizer {
     {
         if (newParent == null) {
             return;
+        }
+
+        if (newChild.getParentOperation() == null)
+        {
+            if (newChild instanceof UnaryOperation)
+            {
+                UnaryOperation uop = (UnaryOperation) newChild;
+                rootOp = uop.getChildOperation();
+                uop.getChildOperation().setParentOperation(null);
+            }
         }
 
         if (newParent instanceof UnaryOperation) {
