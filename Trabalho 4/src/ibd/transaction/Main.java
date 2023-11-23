@@ -5,6 +5,7 @@
  */
 package ibd.transaction;
 
+import ibd.transaction.concurrency.timestamp.ordering.GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager;
 import ibd.transaction.instruction.SingleReadInstruction;
 import ibd.transaction.instruction.SingleUpdateInstruction;
 import ibd.transaction.concurrency.ConcurrencyManager;
@@ -343,13 +344,59 @@ public class Main {
 
     }
 
+    //more than one conflict to be managed
+    public void testSlide(ConcurrencyManager manager) throws Exception {
+        Table table1 = Utils.createTable("c:\\teste\\ibd", "t6", Table.DEFULT_PAGE_SIZE, 1000, false, 1, 50);
+        Transaction t1 = new Transaction();
+        t1.addInstruction(new SingleReadInstruction(table1, getValue("B")));
+        t1.addInstruction(new SingleReadInstruction(table1, getValue("A")));
+        t1.addInstruction(new SingleReadInstruction(table1, getValue("C")));
+
+        Transaction t2 = new Transaction();
+        t2.addInstruction(new SingleUpdateInstruction(table1, getValue("C"), "A1"));
+        t2.addInstruction(new SingleReadInstruction(table1, getValue("B")));
+
+        Transaction t3 = new Transaction();
+        t3.addInstruction(new SingleUpdateInstruction(table1, getValue("B"), "A1"));
+        t3.addInstruction(new SingleReadInstruction(table1, getValue("A")));
+        t3.addInstruction(new SingleUpdateInstruction(table1, getValue("C"), "A1"));
+
+        SimulatedIterations simulation = new SimulatedIterations();
+        simulation.addTransaction(t1);
+        simulation.addTransaction(t2);
+        simulation.addTransaction(t3);
+        simulation.run(100, false, manager);
+
+    }
+
 
     public static void main(String[] args) {
         Main m = new Main();
         try {
             System.out.println("TESTE 1");
-            m.test1(new LockBasedConcurrencyManager());
-
+            m.test1(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 2");
+            m.test2(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 3");
+            m.test3(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 4");
+            m.test4(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 5");
+            m.test5(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 5.1");
+            m.test51(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 6");
+            m.test6(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 7");
+            m.test7(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 8");
+            m.test8(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 9");
+            m.test9(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("TESTE 10");
+            m.test10(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
+            System.out.println("Teste Slide");
+            m.testSlide(new GustavoMachadoDeFreitasTimestampOrderingConcurrencyManager());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
